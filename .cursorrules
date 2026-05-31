@@ -1,0 +1,38 @@
+# Simple YouTube Pomodoro - Cursor Rules
+
+## Project Context
+- React (Vite) + Tailwind CSS
+- YouTube IFrame Player API (react-youtube)
+- LocalStorage for data persistence
+- No backend, no user authentication (MVP)
+
+## Coding Standards
+- Use functional components with Hooks
+- Follow PascalCase for components, camelCase for functions
+- Use Tailwind CSS for styling (inline classes)
+- Keep functions small and focused (single responsibility)
+- Add comments for complex logic
+
+## File Structure
+- Components: src/components/
+- Custom Hooks: src/hooks/
+- Utilities: src/utils/
+- Custom Hooks: src/hooks/
+- Utilities: src/utils/
+
+## Implementation Priority
+1. Timer countdown (useState, useEffect)
+2. YouTube player integration (react-youtube)
+3. LocalStorage persistence (custom hook)
+4. URL input form & playlist management
+5. Auto-play next track
+
+## Best Practices
+- Avoid magic numbers (use constants)
+- Use useMemo/useCallback to prevent unnecessary re-renders
+- Handle errors gracefully (alert for user input, console.error for API errors)
+- Keep YouTube player visible (minimum 200x200px, API requirement)
+
+## References
+- Requirements: docs/requirements.md
+- AI Instructions: docs/ai-instructions.md
