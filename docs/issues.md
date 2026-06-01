@@ -8,9 +8,7 @@
 - [ ] Vite + React プロジェクトの作成
 - [ ] Tailwind CSS のセットアップ
 - [ ] react-youtube のインストール
-- [ ] docs ディレクトリの作成（requirements.md, ai-instructions.md）
-- [ ] .cursorrules の作成
-- [ ] GitHub にプッシュ
+- [ ] ESLint のインストール
 
 ## 参考
 - `docs/requirements.md`
@@ -20,7 +18,6 @@
 - npm run dev でアプリが起動する
 - Tailwind CSS が動作する
 - react-youtube がインストールされている
-- docs と .cursorrules が作成されている
 
 
 #2 タイマーコンポーネントの実装
