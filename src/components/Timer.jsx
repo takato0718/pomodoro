@@ -1,12 +1,35 @@
 import { useTimer } from '../hooks/useTimer.js';
+import { TIMER_MODES } from '../utils/constants.js';
 import { formatTime } from '../utils/formatTime.js';
 
+const MODE_STYLES = {
+  [TIMER_MODES.FOCUS]: {
+    section: 'border border-red-800 bg-red-950/80',
+    label: 'text-red-400',
+    labelText: '集中時間',
+    startButton: 'bg-red-600 hover:bg-red-500',
+  },
+  [TIMER_MODES.BREAK]: {
+    section: 'border border-green-800 bg-green-950/80',
+    label: 'text-green-400',
+    labelText: '休憩時間',
+    startButton: 'bg-green-600 hover:bg-green-500',
+  },
+};
+
 function Timer() {
-  const { remainingSeconds, isRunning, notification, start, pause, reset } =
+  const { mode, remainingSeconds, isRunning, notification, start, pause, reset } =
     useTimer();
+  const styles = MODE_STYLES[mode];
 
   return (
-    <section className="flex flex-col items-center gap-6 rounded-2xl bg-gray-800 p-8 shadow-lg">
+    <section
+      className={`flex flex-col items-center gap-6 rounded-2xl p-8 shadow-lg transition-colors duration-500 ${styles.section}`}
+    >
+      <p className={`text-sm font-semibold uppercase tracking-widest ${styles.label}`}>
+        {styles.labelText}
+      </p>
+
       <p
         className="font-mono text-7xl font-bold tabular-nums tracking-wider text-white"
         aria-live="polite"
@@ -30,7 +53,7 @@ function Timer() {
             type="button"
             onClick={start}
             disabled={remainingSeconds <= 0}
-            className="rounded-lg bg-red-600 px-6 py-2 font-medium text-white transition hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-50"
+            className={`rounded-lg px-6 py-2 font-medium text-white transition disabled:cursor-not-allowed disabled:opacity-50 ${styles.startButton}`}
           >
             スタート
           </button>
