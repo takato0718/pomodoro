@@ -1,4 +1,3 @@
-import { useTimer } from '../hooks/useTimer.js';
 import { TIMER_MODES } from '../utils/constants.js';
 import { formatTime } from '../utils/formatTime.js';
 
@@ -17,9 +16,7 @@ const MODE_STYLES = {
   },
 };
 
-function Timer() {
-  const { mode, remainingSeconds, isRunning, notification, start, pause, reset } =
-    useTimer();
+function Timer({ mode, remainingSeconds, isRunning, notification, start, pause, reset }) {
   const styles = MODE_STYLES[mode];
 
   return (

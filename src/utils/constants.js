@@ -10,3 +10,9 @@ export const TIMER_MODES = {
   FOCUS: 'focus',
   BREAK: 'break',
 };
+
+/** YouTube IFrame Player API の最小表示サイズ（px） */
+export const PLAYER_MIN_SIZE = 200;
+
+/** 動作確認用の固定動画 ID（Lo-Fi Hip Hop） */
+export const DEFAULT_VIDEO_ID = 'jfKfPfyJRdk';
