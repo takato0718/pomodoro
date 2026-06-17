@@ -1,4 +1,8 @@
-import { TIMER_MODES } from '../utils/constants.js';
+import {
+  MAX_TIMER_MINUTES,
+  MIN_TIMER_MINUTES,
+  TIMER_MODES,
+} from '../utils/constants.js';
 import { formatTime } from '../utils/formatTime.js';
 
 const MODE_STYLES = {
@@ -16,13 +20,56 @@ const MODE_STYLES = {
   },
 };
 
-function Timer({ mode, remainingSeconds, isRunning, notification, start, pause, reset }) {
+function Timer({
+  mode,
+  remainingSeconds,
+  isRunning,
+  notification,
+  settings,
+  onSettingsChange,
+  start,
+  pause,
+  reset,
+}) {
   const styles = MODE_STYLES[mode];
 
   return (
     <section
       className={`flex flex-col items-center gap-6 rounded-2xl p-8 shadow-lg transition-colors duration-500 ${styles.section}`}
     >
+      <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-gray-300">
+        <label className="flex items-center gap-2">
+          <span>集中</span>
+          <input
+            type="number"
+            min={MIN_TIMER_MINUTES}
+            max={MAX_TIMER_MINUTES}
+            value={settings.focusTime}
+            disabled={isRunning}
+            onChange={(event) =>
+              onSettingsChange({ focusTime: Number(event.target.value) })
+            }
+            className="w-16 rounded border border-gray-600 bg-gray-800 px-2 py-1 text-center text-white disabled:opacity-50"
+          />
+          <span>分</span>
+        </label>
+        <label className="flex items-center gap-2">
+          <span>休憩</span>
+          <input
+            type="number"
+            min={MIN_TIMER_MINUTES}
+            max={MAX_TIMER_MINUTES}
+            value={settings.breakTime}
+            disabled={isRunning}
+            onChange={(event) =>
+              onSettingsChange({ breakTime: Number(event.target.value) })
+            }
+            className="w-16 rounded border border-gray-600 bg-gray-800 px-2 py-1 text-center text-white disabled:opacity-50"
+          />
+          <span>分</span>
+        </label>
+      </div>
+
       <p className={`text-sm font-semibold uppercase tracking-widest ${styles.label}`}>
         {styles.labelText}
       </p>

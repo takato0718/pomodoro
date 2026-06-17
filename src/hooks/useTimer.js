@@ -18,11 +18,29 @@ export function useTimer(
   const [remainingSeconds, setRemainingSeconds] = useState(focusSeconds);
   const [isRunning, setIsRunning] = useState(false);
   const [notification, setNotification] = useState('');
+  const [durationSnapshot, setDurationSnapshot] = useState({
+    focusSeconds,
+    breakSeconds,
+    mode: TIMER_MODES.FOCUS,
+  });
   const modeRef = useRef(mode);
 
   useEffect(() => {
     modeRef.current = mode;
   }, [mode]);
+
+  // 停止中に設定やモードが変わったら残り時間を同期
+  if (
+    !isRunning &&
+    (durationSnapshot.focusSeconds !== focusSeconds ||
+      durationSnapshot.breakSeconds !== breakSeconds ||
+      durationSnapshot.mode !== mode)
+  ) {
+    setDurationSnapshot({ focusSeconds, breakSeconds, mode });
+    setRemainingSeconds(
+      mode === TIMER_MODES.FOCUS ? focusSeconds : breakSeconds,
+    );
+  }
 
   useEffect(() => {
     if (!isRunning) {
