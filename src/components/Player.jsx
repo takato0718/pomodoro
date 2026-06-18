@@ -1,16 +1,15 @@
 import { useCallback, useEffect, useRef } from 'react';
 import YouTube from 'react-youtube';
 import {
-  DEFAULT_VIDEO_ID,
   PLAYER_MIN_SIZE,
   TIMER_MODES,
 } from '../utils/constants.js';
 
 /**
  * YouTube プレイヤー。タイマーの状態に応じて再生/一時停止を制御する。
- * @param {{ isRunning: boolean, mode: string }} props
+ * @param {{ isRunning: boolean, mode: string, videoId: string, volume: number, onVolumeChange: (volume: number) => void }} props
  */
-function Player({ isRunning, mode }) {
+function Player({ isRunning, mode, videoId, volume, onVolumeChange }) {
   const playerRef = useRef(null);
 
   const shouldPlay = isRunning && mode === TIMER_MODES.FOCUS;
@@ -40,6 +39,10 @@ function Player({ isRunning, mode }) {
     syncPlayback();
   }, [syncPlayback]);
 
+  useEffect(() => {
+    playerRef.current?.setVolume(volume);
+  }, [volume]);
+
   const handleError = (event) => {
     console.error('YouTube Player error:', event.data);
   };
@@ -55,16 +58,27 @@ function Player({ isRunning, mode }) {
 
   return (
     <div
-      className="fixed bottom-4 right-4 overflow-hidden rounded-lg shadow-lg"
-      style={{ minWidth: PLAYER_MIN_SIZE, minHeight: PLAYER_MIN_SIZE }}
+      className="fixed bottom-4 right-4 overflow-hidden rounded-lg bg-gray-800 shadow-lg"
+      style={{ minWidth: PLAYER_MIN_SIZE }}
       aria-label="YouTube プレイヤー"
     >
       <YouTube
-        videoId={DEFAULT_VIDEO_ID}
+        videoId={videoId}
         opts={opts}
         onReady={handleReady}
         onError={handleError}
       />
+      <label className="flex items-center gap-2 px-2 py-2 text-xs text-gray-300">
+        <span>音量</span>
+        <input
+          type="range"
+          min={0}
+          max={100}
+          value={volume}
+          onChange={(event) => onVolumeChange(Number(event.target.value))}
+          className="w-24"
+        />
+      </label>
     </div>
   );
 }
