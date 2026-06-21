@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import Player from './components/Player.jsx';
+import PlaylistForm from './components/PlaylistForm.jsx';
 import Timer from './components/Timer.jsx';
 import { useLocalStorage } from './hooks/useLocalStorage.js';
 import { useTimer } from './hooks/useTimer.js';
@@ -17,7 +18,10 @@ function App() {
     STORAGE_KEYS.SETTINGS,
     DEFAULT_SETTINGS,
   );
-  const [playlist] = useLocalStorage(STORAGE_KEYS.PLAYLIST, DEFAULT_PLAYLIST);
+  const [playlist, setPlaylist] = useLocalStorage(
+    STORAGE_KEYS.PLAYLIST,
+    DEFAULT_PLAYLIST,
+  );
 
   const focusSeconds = settings.focusTime * SECONDS_PER_MINUTE;
   const breakSeconds = settings.breakTime * SECONDS_PER_MINUTE;
@@ -51,6 +55,13 @@ function App() {
     [handleSettingsChange],
   );
 
+  const handleAddTrack = useCallback(
+    (track) => {
+      setPlaylist((prev) => [...prev, track]);
+    },
+    [setPlaylist],
+  );
+
   const videoId = getActiveVideoId(playlist);
 
   return (
@@ -69,6 +80,7 @@ function App() {
         pause={pause}
         reset={reset}
       />
+      <PlaylistForm onAddTrack={handleAddTrack} />
       <Player
         isRunning={isRunning}
         mode={mode}
