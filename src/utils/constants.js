@@ -15,7 +15,7 @@ export const TIMER_MODES = {
 export const PLAYER_MIN_SIZE = 200;
 
 /** 動作確認用の固定動画 ID（Lo-Fi Hip Hop） */
-export const DEFAULT_VIDEO_ID = 'jfKfPfyJRdk';
+export const DEFAULT_VIDEO_ID = 'fvAXHczp2lU';
 
 export const MIN_TIMER_MINUTES = 1;
 export const MAX_TIMER_MINUTES = 90;
