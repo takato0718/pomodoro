@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import Player from './components/Player.jsx';
 import PlaylistForm from './components/PlaylistForm.jsx';
 import Timer from './components/Timer.jsx';
+import TrackList from './components/TrackList.jsx';
 import { useLocalStorage } from './hooks/useLocalStorage.js';
 import { useTimer } from './hooks/useTimer.js';
 import {
@@ -81,6 +82,7 @@ function App() {
         reset={reset}
       />
       <PlaylistForm onAddTrack={handleAddTrack} />
+      <TrackList tracks={playlist} />
       <Player
         isRunning={isRunning}
         mode={mode}
