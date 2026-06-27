@@ -8,9 +8,9 @@ const TRACK_TYPE_ICONS = {
 
 /**
  * 曲リストの1項目
- * @param {{ track: { type: string, id: string, title: string } }} props
+ * @param {{ track: { type: string, id: string, title: string }, index: number, onRemove: (index: number) => void }} props
  */
-function TrackListItem({ track }) {
+function TrackListItem({ track, index, onRemove }) {
   const icon = TRACK_TYPE_ICONS[track.type] ?? '♪';
   const isVideo = track.type === TRACK_TYPES.VIDEO;
 
@@ -37,15 +37,24 @@ function TrackListItem({ track }) {
           <span className="truncate">{track.title}</span>
         </p>
       </div>
+
+      <button
+        type="button"
+        onClick={() => onRemove(index)}
+        aria-label={`「${track.title}」を削除`}
+        className="shrink-0 rounded-lg px-3 py-1.5 text-sm text-gray-400 transition hover:bg-red-900/40 hover:text-red-400"
+      >
+        削除
+      </button>
     </li>
   );
 }
 
 /**
  * 登録済み曲リストの表示
- * @param {{ tracks: Array<{ type: string, id: string, title: string }> }} props
+ * @param {{ tracks: Array<{ type: string, id: string, title: string }>, onRemoveTrack: (index: number) => void }} props
  */
-function TrackList({ tracks }) {
+function TrackList({ tracks, onRemoveTrack }) {
   return (
     <section className="mt-6 w-full max-w-xl rounded-2xl border border-gray-700 bg-gray-800/80 p-6 shadow-lg">
       <h2 className="mb-1 text-lg font-semibold text-white">曲リスト</h2>
@@ -61,6 +70,8 @@ function TrackList({ tracks }) {
             <TrackListItem
               key={`${track.type}-${track.id}-${index}`}
               track={track}
+              index={index}
+              onRemove={onRemoveTrack}
             />
           ))}
         </ul>

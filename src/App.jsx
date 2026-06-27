@@ -63,6 +63,15 @@ function App() {
     [setPlaylist],
   );
 
+  const handleRemoveTrack = useCallback(
+    (index) => {
+      const result = window.confirm('本当に削除しますか？');
+      if (!result) return;
+      setPlaylist((prev) => prev.filter((_, i) => i !== index));
+    },
+    [setPlaylist],
+  );
+
   const videoId = getActiveVideoId(playlist);
 
   return (
@@ -82,7 +91,7 @@ function App() {
         reset={reset}
       />
       <PlaylistForm onAddTrack={handleAddTrack} />
-      <TrackList tracks={playlist} />
+      <TrackList tracks={playlist} onRemoveTrack={handleRemoveTrack} />
       <Player
         isRunning={isRunning}
         mode={mode}
