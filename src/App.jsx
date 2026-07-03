@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import Player from './components/Player.jsx';
 import PlaylistForm from './components/PlaylistForm.jsx';
 import Timer from './components/Timer.jsx';
+import TrackList from './components/TrackList.jsx';
 import { useLocalStorage } from './hooks/useLocalStorage.js';
 import { useTimer } from './hooks/useTimer.js';
 import {
@@ -57,7 +58,20 @@ function App() {
 
   const handleAddTrack = useCallback(
     (track) => {
-      setPlaylist((prev) => [...prev, track]);
+      const newTrack = {
+        ...track,
+        uid: crypto.randomUUID(),
+      };
+      setPlaylist((prev) => [...prev, newTrack]);
+    },
+    [setPlaylist],
+  );
+
+  const handleRemoveTrack = useCallback(
+    (uid) => {
+      const result = window.confirm('本当に削除しますか？');
+      if (!result) return;
+      setPlaylist((prev) => prev.filter((track) => track.uid !== uid));
     },
     [setPlaylist],
   );
@@ -81,6 +95,7 @@ function App() {
         reset={reset}
       />
       <PlaylistForm onAddTrack={handleAddTrack} />
+      <TrackList tracks={playlist} onRemoveTrack={handleRemoveTrack} />
       <Player
         isRunning={isRunning}
         mode={mode}

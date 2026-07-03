@@ -127,3 +127,12 @@ export function parseYouTubeUrl(input) {
 
   return { ok: false, error: '動画 ID またはプレイリスト ID を取得できませんでした' };
 }
+
+/**
+ * YouTube 動画のサムネイル URL を返す
+ * @param {string} videoId
+ * @returns {string}
+ */
+export function getVideoThumbnailUrl(videoId) {
+  return `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
+}
