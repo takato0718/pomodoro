@@ -58,16 +58,20 @@ function App() {
 
   const handleAddTrack = useCallback(
     (track) => {
-      setPlaylist((prev) => [...prev, track]);
+      const newTrack = {
+        ...track,
+        uid: crypto.randomUUID(),
+      };
+      setPlaylist((prev) => [...prev, newTrack]);
     },
     [setPlaylist],
   );
 
   const handleRemoveTrack = useCallback(
-    (index) => {
+    (uid) => {
       const result = window.confirm('本当に削除しますか？');
       if (!result) return;
-      setPlaylist((prev) => prev.filter((_, i) => i !== index));
+      setPlaylist((prev) => prev.filter((track) => track.uid !== uid));
     },
     [setPlaylist],
   );
