@@ -10,7 +10,7 @@ const TRACK_TYPE_ICONS = {
  * 曲リストの1項目
  * @param {{ track: { type: string, id: string, title: string }, index: number, onRemove: (index: number) => void }} props
  */
-function TrackListItem({ track, index, onRemove }) {
+function TrackListItem({ track, onRemove }) {
   const icon = TRACK_TYPE_ICONS[track.type] ?? '♪';
   const isVideo = track.type === TRACK_TYPES.VIDEO;
 
@@ -40,7 +40,7 @@ function TrackListItem({ track, index, onRemove }) {
 
       <button
         type="button"
-        onClick={() => onRemove(index)}
+        onClick={() => onRemove(track.uid)}
         aria-label={`「${track.title}」を削除`}
         className="shrink-0 rounded-lg px-3 py-1.5 text-sm text-gray-400 transition hover:bg-red-900/40 hover:text-red-400"
       >
@@ -66,11 +66,10 @@ function TrackList({ tracks, onRemoveTrack }) {
         <p className="text-sm text-gray-500">まだ曲が登録されていません</p>
       ) : (
         <ul className="flex flex-col gap-2">
-          {tracks.map((track, index) => (
+          {tracks.map((track) => (
             <TrackListItem
-              key={`${track.type}-${track.id}-${index}`}
+              key={track.uid}
               track={track}
-              index={index}
               onRemove={onRemoveTrack}
             />
           ))}
