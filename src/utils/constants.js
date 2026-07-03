@@ -39,6 +39,7 @@ export const DEFAULT_SETTINGS = {
 
 export const DEFAULT_PLAYLIST = [
   {
+    uid: crypto.randomUUID(),
     type: TRACK_TYPES.VIDEO,
     id: DEFAULT_VIDEO_ID,
     title: 'Lo-Fi Hip Hop',
