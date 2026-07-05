@@ -52,12 +52,18 @@ function TrackListItem({ track, onRemove }) {
 
 /**
  * 登録済み曲リストの表示
- * @param {{ tracks: Array<{ type: string, id: string, title: string }>, onRemoveTrack: (index: number) => void }} props
+ * @param {{
+ *   playlistLabel: string,
+ *   tracks: Array<{ type: string, id: string, title: string }>,
+ *   onRemoveTrack: (uid: string) => void,
+ * }} props
  */
-function TrackList({ tracks, onRemoveTrack }) {
+function TrackList({ playlistLabel, tracks, onRemoveTrack }) {
   return (
     <section className="mt-6 w-full max-w-xl rounded-2xl border border-gray-700 bg-gray-800/80 p-6 shadow-lg">
-      <h2 className="mb-1 text-lg font-semibold text-white">曲リスト</h2>
+      <h2 className="mb-1 text-lg font-semibold text-white">
+        {playlistLabel}プレイリスト
+      </h2>
       <p className="mb-4 text-sm text-gray-400">
         登録済みの動画・プレイリスト（{tracks.length}件）
       </p>
