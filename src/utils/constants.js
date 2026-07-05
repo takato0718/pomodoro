@@ -11,6 +11,17 @@ export const TIMER_MODES = {
   BREAK: 'break',
 };
 
+/** プレイリスト編集 UI の対象（タイマー mode とは独立） */
+export const PLAYLIST_EDIT_TARGETS = {
+  FOCUS: TIMER_MODES.FOCUS,
+  BREAK: TIMER_MODES.BREAK,
+};
+
+export const PLAYLIST_EDIT_TARGET_LABELS = {
+  [PLAYLIST_EDIT_TARGETS.FOCUS]: '集中用',
+  [PLAYLIST_EDIT_TARGETS.BREAK]: '休憩用',
+};
+
 /** YouTube IFrame Player API の最小表示サイズ（px） */
 export const PLAYER_MIN_SIZE = 200;
 
@@ -23,7 +34,8 @@ export const DEFAULT_VOLUME = 50;
 
 export const STORAGE_KEYS = {
   SETTINGS: 'pomodoro_settings',
-  PLAYLIST: 'pomodoro_playlist',
+  FOCUS_TRACKS: 'pomodoro_focusTracks',
+  BREAK_TRACKS: 'pomodoro_breakTracks',
 };
 
 export const TRACK_TYPES = {
@@ -37,7 +49,7 @@ export const DEFAULT_SETTINGS = {
   volume: DEFAULT_VOLUME,
 };
 
-export const DEFAULT_PLAYLIST = [
+export const DEFAULT_FOCUS_TRACKS = [
   {
     uid: crypto.randomUUID(),
     type: TRACK_TYPES.VIDEO,
@@ -45,3 +57,5 @@ export const DEFAULT_PLAYLIST = [
     title: 'Lo-Fi Hip Hop',
   },
 ];
+
+export const DEFAULT_BREAK_TRACKS = [];
