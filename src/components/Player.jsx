@@ -12,7 +12,7 @@ import {
 function Player({ isRunning, mode, videoId, volume, onVolumeChange }) {
   const playerRef = useRef(null);
 
-  const shouldPlay = isRunning && mode === TIMER_MODES.FOCUS;
+  const shouldPlay = isRunning
 
   const syncPlayback = useCallback(() => {
     const player = playerRef.current;
