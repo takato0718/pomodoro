@@ -20,10 +20,14 @@ function Player({ isRunning, mode, videoId, volume, onVolumeChange }) {
       return;
     }
 
-    if (shouldPlay) {
-      player.playVideo();
-    } else {
-      player.pauseVideo();
+    try {
+      if (shouldPlay) {
+        player.playVideo();
+      } else {
+        player.pauseVideo();
+      }
+    } catch (error) {
+      console.error('YouTube playback sync failed:', error);
     }
   }, [shouldPlay]);
 
@@ -40,7 +44,11 @@ function Player({ isRunning, mode, videoId, volume, onVolumeChange }) {
   }, [syncPlayback]);
 
   useEffect(() => {
-    playerRef.current?.setVolume(volume);
+    try {
+      playerRef.current?.setVolume(volume);
+    } catch (error) {
+      console.error('YouTube volume sync failed:', error);
+    }
   }, [volume]);
 
   const handleError = (event) => {

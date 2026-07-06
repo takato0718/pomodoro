@@ -10,9 +10,12 @@ const URL_EXAMPLES = [
 
 /**
  * YouTube URL 入力フォーム
- * @param {{ onAddTrack: (track: { type: string, id: string, title: string }) => void }} props
+ * @param {{
+ *   playlistLabel: string,
+ *   onAddTrack: (track: { type: string, id: string, title: string }) => void,
+ * }} props
  */
-function PlaylistForm({ onAddTrack }) {
+function PlaylistForm({ playlistLabel, onAddTrack }) {
   const [url, setUrl] = useState('');
   const [error, setError] = useState('');
   const [lastExtractedId, setLastExtractedId] = useState('');
@@ -45,8 +48,10 @@ function PlaylistForm({ onAddTrack }) {
   };
 
   return (
-    <section className="mt-8 w-full max-w-xl rounded-2xl border border-gray-700 bg-gray-800/80 p-6 shadow-lg">
-      <h2 className="mb-1 text-lg font-semibold text-white">曲を追加</h2>
+    <section className="mt-4 w-full max-w-xl rounded-2xl border border-gray-700 bg-gray-800/80 p-6 shadow-lg">
+      <h2 className="mb-1 text-lg font-semibold text-white">
+        {playlistLabel}プレイリストに曲を追加
+      </h2>
       <p className="mb-4 text-sm text-gray-400">
         YouTube の動画 URL またはプレイリスト URL を入力してください
       </p>
