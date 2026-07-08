@@ -1,15 +1,12 @@
 import { useCallback, useEffect, useRef } from 'react';
 import YouTube from 'react-youtube';
-import {
-  PLAYER_MIN_SIZE,
-  TIMER_MODES,
-} from '../utils/constants.js';
+import { PLAYER_MIN_SIZE } from '../utils/constants.js';
 
 /**
  * YouTube プレイヤー。タイマーの状態に応じて再生/一時停止を制御する。
- * @param {{ isRunning: boolean, mode: string, videoId: string, volume: number, onVolumeChange: (volume: number) => void }} props
+ * @param {{ isRunning: boolean, mode: string, videoId: string, volume: number, onVolumeChange: (volume: number) => void, onVideoEnd: () => void }} props
  */
-function Player({ isRunning, mode, videoId, volume, onVolumeChange }) {
+function Player({ isRunning, mode, videoId, volume, onVolumeChange, onVideoEnd }) {
   const playerRef = useRef(null);
 
   const shouldPlay = isRunning
@@ -38,6 +35,10 @@ function Player({ isRunning, mode, videoId, volume, onVolumeChange }) {
     },
     [syncPlayback],
   );
+
+  const handleVideoEnd = useCallback(() => {
+    onVideoEnd?.();
+  }, [onVideoEnd]);
 
   useEffect(() => {
     syncPlayback();
@@ -74,6 +75,7 @@ function Player({ isRunning, mode, videoId, volume, onVolumeChange }) {
         videoId={videoId}
         opts={opts}
         onReady={handleReady}
+        onEnd={handleVideoEnd}
         onError={handleError}
       />
       <label className="flex items-center gap-2 px-2 py-2 text-xs text-gray-300">
