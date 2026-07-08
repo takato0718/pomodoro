@@ -13,6 +13,7 @@ import {
   PLAYLIST_EDIT_TARGET_LABELS,
   SECONDS_PER_MINUTE,
   STORAGE_KEYS,
+  TIMER_MODES,
 } from './utils/constants.js';
 import { getActiveVideoId } from './utils/playlist.js';
 import { clampTimerMinutes } from './utils/timerSettings.js';
@@ -89,6 +90,18 @@ function App() {
     },
     [handleSettingsChange],
   );
+
+  const handleVideoEnd = useCallback(() => {
+    const tracks = mode === TIMER_MODES.FOCUS ? focusTracks : breakTracks;
+    const setIndex =
+      mode === TIMER_MODES.FOCUS ? setFocusIndex : setBreakIndex;
+
+    if (tracks.length === 0) {
+      return;
+    }
+
+    setIndex((prev) => (prev + 1) % tracks.length);
+  }, [mode, focusTracks, breakTracks]);
 
   const handleAddTrack = useCallback(
     (track) => {
@@ -179,6 +192,7 @@ function App() {
         videoId={videoId}
         volume={settings.volume}
         onVolumeChange={handleVolumeChange}
+        onVideoEnd={handleVideoEnd}
       />
     </div>
   );
