@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 import YouTube from 'react-youtube';
 import { PLAYER_MIN_SIZE } from '../utils/constants.js';
 
@@ -6,10 +6,13 @@ import { PLAYER_MIN_SIZE } from '../utils/constants.js';
  * YouTube プレイヤー。タイマーの状態に応じて再生/一時停止を制御する。
  * @param {{ isRunning: boolean, mode: string, videoId: string, volume: number, onVolumeChange: (volume: number) => void, onVideoEnd: () => void }} props
  */
-function Player({ isRunning, mode, videoId, volume, onVolumeChange, onVideoEnd }) {
+const Player = forwardRef(function Player(
+  { isRunning, mode: _mode, videoId, volume, onVolumeChange, onVideoEnd },
+  ref,
+) {
   const playerRef = useRef(null);
 
-  const shouldPlay = isRunning
+  const shouldPlay = isRunning;
 
   const syncPlayback = useCallback(() => {
     const player = playerRef.current;
@@ -27,6 +30,31 @@ function Player({ isRunning, mode, videoId, volume, onVolumeChange, onVideoEnd }
       console.error('YouTube playback sync failed:', error);
     }
   }, [shouldPlay]);
+
+  const getCurrentTime = useCallback(() => {
+    const player = playerRef.current;
+    if (!player) {
+      return null;
+    }
+
+    try {
+      const currentTime = player.getCurrentTime();
+      return typeof currentTime === 'number' && !Number.isNaN(currentTime)
+        ? currentTime
+        : null;
+    } catch (error) {
+      console.error('YouTube getCurrentTime failed:', error);
+      return null;
+    }
+  }, []);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      getCurrentTime,
+    }),
+    [getCurrentTime],
+  );
 
   const handleReady = useCallback(
     (event) => {
@@ -91,6 +119,6 @@ function Player({ isRunning, mode, videoId, volume, onVolumeChange, onVideoEnd }
       </label>
     </div>
   );
-}
+});
 
 export default Player;
