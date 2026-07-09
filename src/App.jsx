@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import Player from './components/Player.jsx';
 import PlaylistForm from './components/PlaylistForm.jsx';
 import Timer from './components/Timer.jsx';
@@ -34,12 +34,42 @@ function App() {
   const [focusIndex, setFocusIndex] = useState(0);
   const [breakIndex, setBreakIndex] = useState(0);
   const [editTarget, setEditTarget] = useState(PLAYLIST_EDIT_TARGETS.FOCUS);
+  // #11 で使用する。モードを離れるときに videoId + 再生位置を保存する
+  const [focusResume, setFocusResume] = useState(null);
+  const [breakResume, setBreakResume] = useState(null);
+  const playerRef = useRef(null);
 
   const focusSeconds = settings.focusTime * SECONDS_PER_MINUTE;
   const breakSeconds = settings.breakTime * SECONDS_PER_MINUTE;
 
+  const handleBeforeModeChange = useCallback(
+    (leavingMode) => {
+      const tracks =
+        leavingMode === TIMER_MODES.FOCUS ? focusTracks : breakTracks;
+      const index =
+        leavingMode === TIMER_MODES.FOCUS ? focusIndex : breakIndex;
+      const leavingVideoId = getActiveVideoId(tracks, index);
+      const currentTime = playerRef.current?.getCurrentTime?.() ?? null;
+
+      // Player 未準備時や取得失敗時は保存しない
+      if (currentTime == null) {
+        return;
+      }
+
+      const resume = { videoId: leavingVideoId, currentTime };
+      if (leavingMode === TIMER_MODES.FOCUS) {
+        setFocusResume(resume);
+      } else {
+        setBreakResume(resume);
+      }
+    },
+    [focusTracks, breakTracks, focusIndex, breakIndex],
+  );
+
   const { mode, remainingSeconds, isRunning, notification, start, pause, reset } =
-    useTimer(focusSeconds, breakSeconds);
+    useTimer(focusSeconds, breakSeconds, {
+      onBeforeModeChange: handleBeforeModeChange,
+    });
 
   const tracksByMode = {
     [PLAYLIST_EDIT_TARGETS.FOCUS]: focusTracks,
@@ -187,6 +217,7 @@ function App() {
         onRemoveTrack={handleRemoveTrack}
       />
       <Player
+        ref={playerRef}
         isRunning={isRunning}
         mode={mode}
         videoId={videoId}
