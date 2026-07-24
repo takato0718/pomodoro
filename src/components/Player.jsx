@@ -14,7 +14,7 @@ const VIDEO_END_DEBOUNCE_MS = 500;
 
 /**
  * YouTube プレイヤー。タイマーの状態に応じて再生/一時停止を制御する。
- * @param {{ isRunning: boolean, videoId: string, volume: number, resume: ResumeData | null, onVolumeChange: (volume: number) => void, onVideoEnd: () => void, onResumeConsumed: () => void }} props
+ * @param {{ isRunning: boolean, videoId: string, volume: number, resume: ResumeData | null, onVolumeChange: (volume: number) => void, onVideoEnd: () => void, onVideoError: (errorCode: number) => void, onPlaybackOk: () => void, onResumeConsumed: () => void }} props
  */
 const Player = forwardRef(function Player(
   {
@@ -24,6 +24,8 @@ const Player = forwardRef(function Player(
     resume,
     onVolumeChange,
     onVideoEnd,
+    onVideoError,
+    onPlaybackOk,
     onResumeConsumed,
   },
   ref,
@@ -260,6 +262,22 @@ const Player = forwardRef(function Player(
     onVideoEnd?.();
   }, [clearResumeTimer, onVideoEnd]);
 
+  const handleError = useCallback(
+    (event) => {
+      const errorCode = event?.data;
+      console.error('YouTube Player error:', errorCode);
+      stickyStartRef.current = null;
+      clearResumeTimer();
+      // onEnd 用デバウンスは使わず、すぐに次曲処理へ渡す
+      onVideoError?.(errorCode);
+    },
+    [clearResumeTimer, onVideoError],
+  );
+
+  const handlePlay = useCallback(() => {
+    onPlaybackOk?.();
+  }, [onPlaybackOk]);
+
   // videoId 変更時は旧インスタンスを無効化し、onReady まで操作しない
   useEffect(() => {
     if (readyVideoIdRef.current !== videoId) {
@@ -300,10 +318,6 @@ const Player = forwardRef(function Player(
     }
   }, [volume, videoId, isPlayerReadyFor]);
 
-  const handleError = (event) => {
-    console.error('YouTube Player error:', event.data);
-  };
-
   return (
     <div
       className="fixed bottom-4 right-4 overflow-hidden rounded-lg bg-gray-800 shadow-lg"
@@ -314,6 +328,7 @@ const Player = forwardRef(function Player(
         videoId={videoId}
         opts={opts}
         onReady={handleReady}
+        onPlay={handlePlay}
         onEnd={handleVideoEnd}
         onError={handleError}
       />

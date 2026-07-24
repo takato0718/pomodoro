@@ -25,6 +25,9 @@ export const PLAYLIST_EDIT_TARGET_LABELS = {
 /** YouTube IFrame Player API の最小表示サイズ（px） */
 export const PLAYER_MIN_SIZE = 200;
 
+/** 全曲エラー時の最低スキップ回数（プレイリストが短い場合の下限） */
+export const MIN_PLAYBACK_ERROR_RETRIES = 3;
+
 /** 動作確認用の固定動画 ID（Lo-Fi Hip Hop） */
 export const DEFAULT_VIDEO_ID = 'fvAXHczp2lU';
 
