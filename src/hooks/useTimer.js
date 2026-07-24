@@ -27,11 +27,16 @@ export function useTimer(
     mode: TIMER_MODES.FOCUS,
   });
   const modeRef = useRef(mode);
+  const remainingRef = useRef(remainingSeconds);
   const onBeforeModeChangeRef = useRef(onBeforeModeChange);
 
   useEffect(() => {
     modeRef.current = mode;
   }, [mode]);
+
+  useEffect(() => {
+    remainingRef.current = remainingSeconds;
+  }, [remainingSeconds]);
 
   useEffect(() => {
     onBeforeModeChangeRef.current = onBeforeModeChange;
@@ -56,28 +61,32 @@ export function useTimer(
     }
 
     const intervalId = setInterval(() => {
-      setRemainingSeconds((prev) => {
-        if (prev <= 1) {
-          setIsRunning(false);
+      const next = remainingRef.current - 1;
+      if (next > 0) {
+        setRemainingSeconds(next);
+        return;
+      }
 
-          if (modeRef.current === TIMER_MODES.FOCUS) {
-            onBeforeModeChangeRef.current?.(
-              TIMER_MODES.FOCUS,
-              TIMER_MODES.BREAK,
-            );
-            setMode(TIMER_MODES.BREAK);
-            setNotification('休憩時間です！');
-            return breakSeconds;
-          }
+      const leavingMode = modeRef.current;
+      const nextMode =
+        leavingMode === TIMER_MODES.FOCUS
+          ? TIMER_MODES.BREAK
+          : TIMER_MODES.FOCUS;
 
-          onBeforeModeChangeRef.current?.(TIMER_MODES.BREAK, TIMER_MODES.FOCUS);
-          setMode(TIMER_MODES.FOCUS);
-          setNotification('集中時間です！');
-          return focusSeconds;
-        }
+      // 再生位置の保存は pause や mode 変更より先に行う（updater 外で同期的に実行）
+      onBeforeModeChangeRef.current?.(leavingMode, nextMode);
+      setIsRunning(false);
 
-        return prev - 1;
-      });
+      if (leavingMode === TIMER_MODES.FOCUS) {
+        setMode(TIMER_MODES.BREAK);
+        setNotification('休憩時間です！');
+        setRemainingSeconds(breakSeconds);
+        return;
+      }
+
+      setMode(TIMER_MODES.FOCUS);
+      setNotification('集中時間です！');
+      setRemainingSeconds(focusSeconds);
     }, 1000);
 
     return () => clearInterval(intervalId);
