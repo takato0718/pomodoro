@@ -20,6 +20,10 @@ import {
   getActiveVideoId,
 } from './utils/playlist.js';
 import { clampTimerMinutes } from './utils/timerSettings.js';
+import {
+  formatYouTubeError,
+  getPlaybackErrorRetryLimit,
+} from './utils/youtubeErrors.js';
 
 function App() {
   const [settings, setSettings] = useLocalStorage(
@@ -40,9 +44,15 @@ function App() {
   // #10 で保存、#11 で復帰に使用する
   const [focusResume, setFocusResume] = useState(null);
   const [breakResume, setBreakResume] = useState(null);
+  const [playbackError, setPlaybackError] = useState('');
   const playerRef = useRef(null);
   const focusIndexRef = useRef(focusIndex);
   const breakIndexRef = useRef(breakIndex);
+  /** モード別の連続再生失敗回数（正常再生でリセット） */
+  const consecutivePlaybackErrorsRef = useRef({
+    [TIMER_MODES.FOCUS]: 0,
+    [TIMER_MODES.BREAK]: 0,
+  });
 
   useEffect(() => {
     focusIndexRef.current = focusIndex;
@@ -177,17 +187,60 @@ function App() {
     [handleSettingsChange],
   );
 
-  const handleVideoEnd = useCallback(() => {
+  const advanceToNextTrack = useCallback(() => {
     const tracks = mode === TIMER_MODES.FOCUS ? focusTracks : breakTracks;
     const setIndex =
       mode === TIMER_MODES.FOCUS ? setFocusIndex : setBreakIndex;
 
     if (tracks.length === 0) {
-      return;
+      return false;
     }
 
     setIndex((prev) => (prev + 1) % tracks.length);
+    return true;
   }, [mode, focusTracks, breakTracks]);
+
+  const handleVideoEnd = useCallback(() => {
+    consecutivePlaybackErrorsRef.current[mode] = 0;
+    setPlaybackError('');
+    advanceToNextTrack();
+  }, [mode, advanceToNextTrack]);
+
+  const handleVideoError = useCallback(
+    (errorCode) => {
+      const tracks = mode === TIMER_MODES.FOCUS ? focusTracks : breakTracks;
+      const detail = formatYouTubeError(errorCode);
+      const limit = getPlaybackErrorRetryLimit(tracks.length);
+
+      consecutivePlaybackErrorsRef.current[mode] += 1;
+      const attempt = consecutivePlaybackErrorsRef.current[mode];
+
+      if (tracks.length === 0 || attempt >= limit) {
+        setPlaybackError(
+          `再生できる動画がありません。プレイリストを確認してください。（${detail}）`,
+        );
+        pause();
+        return;
+      }
+
+      setPlaybackError(
+        `再生できないため次の曲へ進みます。（${detail} / ${attempt}/${limit}）`,
+      );
+      advanceToNextTrack();
+    },
+    [mode, focusTracks, breakTracks, advanceToNextTrack, pause],
+  );
+
+  const handlePlaybackOk = useCallback(() => {
+    if (
+      consecutivePlaybackErrorsRef.current[mode] === 0 &&
+      playbackError === ''
+    ) {
+      return;
+    }
+    consecutivePlaybackErrorsRef.current[mode] = 0;
+    setPlaybackError('');
+  }, [mode, playbackError]);
 
   const handleAddTrack = useCallback(
     (track) => {
@@ -237,6 +290,15 @@ function App() {
         reset={reset}
       />
 
+      {playbackError && (
+        <p
+          className="mt-4 max-w-xl rounded-lg border border-amber-700/80 bg-amber-950/80 px-4 py-3 text-center text-sm text-amber-200"
+          role="alert"
+        >
+          {playbackError}
+        </p>
+      )}
+
       <div
         className="mt-8 flex w-full max-w-xl rounded-xl border border-gray-700 bg-gray-800/80 p-1"
         role="tablist"
@@ -280,6 +342,8 @@ function App() {
         volume={settings.volume}
         onVolumeChange={handleVolumeChange}
         onVideoEnd={handleVideoEnd}
+        onVideoError={handleVideoError}
+        onPlaybackOk={handlePlaybackOk}
         onResumeConsumed={handleResumeConsumed}
       />
     </div>
