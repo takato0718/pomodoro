@@ -24,3 +24,19 @@ export function getActiveVideoId(tracks, index = 0) {
 
   return DEFAULT_VIDEO_ID;
 }
+
+/**
+ * 動画 ID に一致する曲のインデックスを返す。見つからなければ -1。
+ * @param {Array<{ type: string, id: string }>} tracks
+ * @param {string} videoId
+ * @returns {number}
+ */
+export function findTrackIndexByVideoId(tracks, videoId) {
+  if (!Array.isArray(tracks) || !videoId) {
+    return -1;
+  }
+
+  return tracks.findIndex(
+    (track) => track?.type === TRACK_TYPES.VIDEO && track.id === videoId,
+  );
+}

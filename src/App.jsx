@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Player from './components/Player.jsx';
 import PlaylistForm from './components/PlaylistForm.jsx';
 import Timer from './components/Timer.jsx';
@@ -15,7 +15,10 @@ import {
   STORAGE_KEYS,
   TIMER_MODES,
 } from './utils/constants.js';
-import { getActiveVideoId } from './utils/playlist.js';
+import {
+  findTrackIndexByVideoId,
+  getActiveVideoId,
+} from './utils/playlist.js';
 import { clampTimerMinutes } from './utils/timerSettings.js';
 
 function App() {
@@ -34,10 +37,20 @@ function App() {
   const [focusIndex, setFocusIndex] = useState(0);
   const [breakIndex, setBreakIndex] = useState(0);
   const [editTarget, setEditTarget] = useState(PLAYLIST_EDIT_TARGETS.FOCUS);
-  // #11 で使用する。モードを離れるときに videoId + 再生位置を保存する
+  // #10 で保存、#11 で復帰に使用する
   const [focusResume, setFocusResume] = useState(null);
   const [breakResume, setBreakResume] = useState(null);
   const playerRef = useRef(null);
+  const focusIndexRef = useRef(focusIndex);
+  const breakIndexRef = useRef(breakIndex);
+
+  useEffect(() => {
+    focusIndexRef.current = focusIndex;
+  }, [focusIndex]);
+
+  useEffect(() => {
+    breakIndexRef.current = breakIndex;
+  }, [breakIndex]);
 
   const focusSeconds = settings.focusTime * SECONDS_PER_MINUTE;
   const breakSeconds = settings.breakTime * SECONDS_PER_MINUTE;
@@ -47,23 +60,40 @@ function App() {
       const tracks =
         leavingMode === TIMER_MODES.FOCUS ? focusTracks : breakTracks;
       const index =
-        leavingMode === TIMER_MODES.FOCUS ? focusIndex : breakIndex;
-      const leavingVideoId = getActiveVideoId(tracks, index);
+        leavingMode === TIMER_MODES.FOCUS
+          ? focusIndexRef.current
+          : breakIndexRef.current;
+      const setIndex =
+        leavingMode === TIMER_MODES.FOCUS ? setFocusIndex : setBreakIndex;
+
+      // 実際に再生中の動画を優先（次曲へ進んだ直後のインデックスずれを防ぐ）
+      const playingVideoId = playerRef.current?.getPlayingVideoId?.();
       const currentTime = playerRef.current?.getCurrentTime?.() ?? null;
+      const videoId = playingVideoId || getActiveVideoId(tracks, index);
 
       // Player 未準備時や取得失敗時は保存しない
-      if (currentTime == null) {
+      if (currentTime == null || !videoId) {
         return;
       }
 
-      const resume = { videoId: leavingVideoId, currentTime };
+      const trackIndex = findTrackIndexByVideoId(tracks, videoId);
+      const resolvedIndex = trackIndex >= 0 ? trackIndex : index;
+      if (trackIndex >= 0 && trackIndex !== index) {
+        setIndex(trackIndex);
+      }
+
+      const resume = {
+        videoId,
+        currentTime,
+        trackIndex: resolvedIndex,
+      };
       if (leavingMode === TIMER_MODES.FOCUS) {
         setFocusResume(resume);
       } else {
         setBreakResume(resume);
       }
     },
-    [focusTracks, breakTracks, focusIndex, breakIndex],
+    [focusTracks, breakTracks],
   );
 
   const { mode, remainingSeconds, isRunning, notification, start, pause, reset } =
@@ -93,7 +123,33 @@ function App() {
   const setActiveTracks = setTracksByMode[editTarget];
   const setActiveIndex = setIndexByMode[editTarget];
   const editTargetLabel = PLAYLIST_EDIT_TARGET_LABELS[editTarget];
-  const videoId = getActiveVideoId(tracksByMode[mode], indexByMode[mode]);
+  const activeResume =
+    mode === TIMER_MODES.FOCUS ? focusResume : breakResume;
+  const videoId =
+    activeResume?.videoId ??
+    getActiveVideoId(tracksByMode[mode], indexByMode[mode]);
+
+  const handleResumeConsumed = useCallback(() => {
+    const resume = mode === TIMER_MODES.FOCUS ? focusResume : breakResume;
+    const tracks = mode === TIMER_MODES.FOCUS ? focusTracks : breakTracks;
+    const setIndex =
+      mode === TIMER_MODES.FOCUS ? setFocusIndex : setBreakIndex;
+
+    if (resume) {
+      const trackIndex =
+        resume.trackIndex ??
+        findTrackIndexByVideoId(tracks, resume.videoId);
+      if (trackIndex >= 0) {
+        setIndex(trackIndex);
+      }
+    }
+
+    if (mode === TIMER_MODES.FOCUS) {
+      setFocusResume(null);
+    } else {
+      setBreakResume(null);
+    }
+  }, [mode, focusResume, breakResume, focusTracks, breakTracks]);
 
   const handleSettingsChange = useCallback(
     (partial) => {
@@ -219,11 +275,12 @@ function App() {
       <Player
         ref={playerRef}
         isRunning={isRunning}
-        mode={mode}
         videoId={videoId}
+        resume={activeResume}
         volume={settings.volume}
         onVolumeChange={handleVolumeChange}
         onVideoEnd={handleVideoEnd}
+        onResumeConsumed={handleResumeConsumed}
       />
     </div>
   );
