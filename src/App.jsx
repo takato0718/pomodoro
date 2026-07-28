@@ -9,6 +9,7 @@ import {
   DEFAULT_BREAK_TRACKS,
   DEFAULT_FOCUS_TRACKS,
   DEFAULT_SETTINGS,
+  PLAYER_SIZES,
   PLAYLIST_EDIT_TARGETS,
   PLAYLIST_EDIT_TARGET_LABELS,
   SECONDS_PER_MINUTE,
@@ -41,6 +42,7 @@ function App() {
   const [focusIndex, setFocusIndex] = useState(0);
   const [breakIndex, setBreakIndex] = useState(0);
   const [editTarget, setEditTarget] = useState(PLAYLIST_EDIT_TARGETS.FOCUS);
+  const [playerSize, setPlayerSize] = useState(PLAYER_SIZES.SMALL);
   // #10 で保存、#11 で復帰に使用する
   const [focusResume, setFocusResume] = useState(null);
   const [breakResume, setBreakResume] = useState(null);
@@ -133,6 +135,7 @@ function App() {
   const setActiveTracks = setTracksByMode[editTarget];
   const setActiveIndex = setIndexByMode[editTarget];
   const editTargetLabel = PLAYLIST_EDIT_TARGET_LABELS[editTarget];
+  const isEditingBreak = editTarget === PLAYLIST_EDIT_TARGETS.BREAK;
   const activeResume =
     mode === TIMER_MODES.FOCUS ? focusResume : breakResume;
   const videoId =
@@ -274,21 +277,38 @@ function App() {
   );
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-900 px-4 text-white">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-900 px-4 py-8 text-white">
       <h1 className="mb-8 text-4xl font-bold text-red-500">
         Simple YouTube Pomodoro
       </h1>
-      <Timer
-        mode={mode}
-        remainingSeconds={remainingSeconds}
-        isRunning={isRunning}
-        notification={notification}
-        settings={settings}
-        onSettingsChange={handleSettingsChange}
-        start={start}
-        pause={pause}
-        reset={reset}
-      />
+
+      <div className="flex w-full max-w-5xl flex-col items-center gap-6 lg:flex-row lg:items-start lg:justify-center">
+        <Timer
+          mode={mode}
+          remainingSeconds={remainingSeconds}
+          isRunning={isRunning}
+          notification={notification}
+          settings={settings}
+          onSettingsChange={handleSettingsChange}
+          start={start}
+          pause={pause}
+          reset={reset}
+        />
+        <Player
+          ref={playerRef}
+          isRunning={isRunning}
+          videoId={videoId}
+          resume={activeResume}
+          volume={settings.volume}
+          size={playerSize}
+          onSizeChange={setPlayerSize}
+          onVolumeChange={handleVolumeChange}
+          onVideoEnd={handleVideoEnd}
+          onVideoError={handleVideoError}
+          onPlaybackOk={handlePlaybackOk}
+          onResumeConsumed={handleResumeConsumed}
+        />
+      </div>
 
       {playbackError && (
         <p
@@ -306,6 +326,10 @@ function App() {
       >
         {Object.values(PLAYLIST_EDIT_TARGETS).map((target) => {
           const isActive = editTarget === target;
+          const activeClass =
+            target === PLAYLIST_EDIT_TARGETS.BREAK
+              ? 'bg-green-600 text-white'
+              : 'bg-red-600 text-white';
           return (
             <button
               key={target}
@@ -315,7 +339,7 @@ function App() {
               onClick={() => setEditTarget(target)}
               className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition ${
                 isActive
-                  ? 'bg-red-600 text-white'
+                  ? activeClass
                   : 'text-gray-400 hover:bg-gray-700/60 hover:text-white'
               }`}
             >
@@ -327,24 +351,13 @@ function App() {
 
       <PlaylistForm
         playlistLabel={editTargetLabel}
+        accent={isEditingBreak ? 'break' : 'focus'}
         onAddTrack={handleAddTrack}
       />
       <TrackList
         playlistLabel={editTargetLabel}
         tracks={activeTracks}
         onRemoveTrack={handleRemoveTrack}
-      />
-      <Player
-        ref={playerRef}
-        isRunning={isRunning}
-        videoId={videoId}
-        resume={activeResume}
-        volume={settings.volume}
-        onVolumeChange={handleVolumeChange}
-        onVideoEnd={handleVideoEnd}
-        onVideoError={handleVideoError}
-        onPlaybackOk={handlePlaybackOk}
-        onResumeConsumed={handleResumeConsumed}
       />
     </div>
   );
