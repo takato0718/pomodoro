@@ -1,6 +1,11 @@
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef } from 'react';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import YouTube from 'react-youtube';
-import { PLAYER_MIN_SIZE } from '../utils/constants.js';
+import {
+  PLAYER_MIN_SIZE,
+  PLAYER_SIZES,
+} from '../utils/constants.js';
+import { getPlayerFrameSize } from '../utils/playerLayout.js';
+import PlayerSizeControls from './PlayerSizeControls.jsx';
 
 /** react-youtube の updateVideo(cueVideoById) 後にシークし直すまでの待機（ms） */
 const RESUME_SETTLE_MS = 300;
@@ -14,14 +19,16 @@ const VIDEO_END_DEBOUNCE_MS = 500;
 
 /**
  * YouTube プレイヤー。タイマーの状態に応じて再生/一時停止を制御する。
- * @param {{ isRunning: boolean, videoId: string, volume: number, resume: ResumeData | null, onVolumeChange: (volume: number) => void, onVideoEnd: () => void, onVideoError: (errorCode: number) => void, onPlaybackOk: () => void, onResumeConsumed: () => void }} props
+ * @param {{ isRunning: boolean, videoId: string, volume: number, size: string, resume: ResumeData | null, onSizeChange: (size: string) => void, onVolumeChange: (volume: number) => void, onVideoEnd: () => void, onVideoError: (errorCode: number) => void, onPlaybackOk: () => void, onResumeConsumed: () => void }} props
  */
 const Player = forwardRef(function Player(
   {
     isRunning,
     videoId,
     volume,
+    size = PLAYER_SIZES.SMALL,
     resume,
+    onSizeChange,
     onVolumeChange,
     onVideoEnd,
     onVideoError,
@@ -44,6 +51,7 @@ const Player = forwardRef(function Player(
    * start を外すと react-youtube が先頭から cue し直してしまう。
    */
   const stickyStartRef = useRef(/** @type {{ videoId: string, start: number } | null} */ (null));
+  const [frameSize, setFrameSize] = useState(() => getPlayerFrameSize(size));
 
   resumeRef.current = resume;
   videoIdRef.current = videoId;
@@ -69,17 +77,26 @@ const Player = forwardRef(function Player(
       ? stickyStartRef.current.start
       : undefined;
 
+  useEffect(() => {
+    const updateFrameSize = () => {
+      setFrameSize(getPlayerFrameSize(size));
+    };
+    updateFrameSize();
+    window.addEventListener('resize', updateFrameSize);
+    return () => window.removeEventListener('resize', updateFrameSize);
+  }, [size]);
+
   const opts = useMemo(
     () => ({
-      height: String(PLAYER_MIN_SIZE),
-      width: String(PLAYER_MIN_SIZE),
+      height: String(frameSize.height),
+      width: String(frameSize.width),
       playerVars: {
         autoplay: 0,
         controls: 1,
         ...(startSeconds != null ? { start: startSeconds } : {}),
       },
     }),
-    [startSeconds],
+    [frameSize.height, frameSize.width, startSeconds],
   );
 
   const isPlayerReadyFor = useCallback((targetVideoId) => {
@@ -320,29 +337,53 @@ const Player = forwardRef(function Player(
 
   return (
     <div
-      className="fixed bottom-4 right-4 overflow-hidden rounded-lg bg-gray-800 shadow-lg"
-      style={{ minWidth: PLAYER_MIN_SIZE }}
+      className={
+        size === PLAYER_SIZES.LARGE
+          ? 'fixed inset-0 z-50 flex flex-col bg-black/95 p-3'
+          : size === PLAYER_SIZES.MEDIUM
+            ? 'fixed inset-x-0 bottom-0 z-40 flex h-[50vh] min-h-[248px] flex-col border-t border-gray-700 bg-gray-950/95 p-3 shadow-2xl'
+            : 'shrink-0 overflow-hidden rounded-lg bg-gray-800 shadow-lg'
+      }
+      style={
+        size === PLAYER_SIZES.SMALL
+          ? { minWidth: PLAYER_MIN_SIZE }
+          : undefined
+      }
       aria-label="YouTube プレイヤー"
     >
-      <YouTube
-        videoId={videoId}
-        opts={opts}
-        onReady={handleReady}
-        onPlay={handlePlay}
-        onEnd={handleVideoEnd}
-        onError={handleError}
-      />
-      <label className="flex items-center gap-2 px-2 py-2 text-xs text-gray-300">
-        <span>音量</span>
-        <input
-          type="range"
-          min={0}
-          max={100}
-          value={volume}
-          onChange={(event) => onVolumeChange(Number(event.target.value))}
-          className="w-24"
+      <div className="mb-2 flex flex-wrap items-center gap-3">
+        <PlayerSizeControls size={size} onChange={onSizeChange} />
+        <label className="flex items-center gap-2 text-xs text-gray-300">
+          <span>音量</span>
+          <input
+            type="range"
+            min={0}
+            max={100}
+            value={volume}
+            onChange={(event) => onVolumeChange(Number(event.target.value))}
+            className="w-24"
+          />
+        </label>
+        {size !== PLAYER_SIZES.SMALL && (
+          <button
+            type="button"
+            onClick={() => onSizeChange(PLAYER_SIZES.SMALL)}
+            className="ml-auto rounded-md border border-gray-600 px-2 py-1 text-xs text-gray-200 transition hover:bg-gray-800"
+          >
+            タイマー表示に戻す
+          </button>
+        )}
+      </div>
+      <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-md bg-black">
+        <YouTube
+          videoId={videoId}
+          opts={opts}
+          onReady={handleReady}
+          onPlay={handlePlay}
+          onEnd={handleVideoEnd}
+          onError={handleError}
         />
-      </label>
+      </div>
     </div>
   );
 });
