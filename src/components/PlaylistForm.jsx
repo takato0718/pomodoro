@@ -12,13 +12,21 @@ const URL_EXAMPLES = [
  * YouTube URL 入力フォーム
  * @param {{
  *   playlistLabel: string,
+ *   accent?: 'focus' | 'break',
  *   onAddTrack: (track: { type: string, id: string, title: string }) => void,
  * }} props
  */
-function PlaylistForm({ playlistLabel, onAddTrack }) {
+function PlaylistForm({ playlistLabel, accent = 'focus', onAddTrack }) {
   const [url, setUrl] = useState('');
   const [error, setError] = useState('');
   const [lastExtractedId, setLastExtractedId] = useState('');
+  const isBreak = accent === 'break';
+  const focusBorderClass = isBreak
+    ? 'focus:border-green-500'
+    : 'focus:border-red-500';
+  const submitButtonClass = isBreak
+    ? 'bg-green-600 hover:bg-green-500'
+    : 'bg-red-600 hover:bg-red-500';
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -69,7 +77,7 @@ function PlaylistForm({ playlistLabel, onAddTrack }) {
               }
             }}
             placeholder={URL_EXAMPLES[0]}
-            className="rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-white placeholder:text-gray-500 focus:border-red-500 focus:outline-none"
+            className={`rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-white placeholder:text-gray-500 focus:outline-none ${focusBorderClass}`}
           />
         </label>
 
@@ -91,7 +99,7 @@ function PlaylistForm({ playlistLabel, onAddTrack }) {
 
         <button
           type="submit"
-          className="rounded-lg bg-red-600 px-4 py-2 font-medium text-white transition hover:bg-red-500"
+          className={`rounded-lg px-4 py-2 font-medium text-white transition ${submitButtonClass}`}
         >
           追加
         </button>
