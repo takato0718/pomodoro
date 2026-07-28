@@ -25,6 +25,22 @@ export const PLAYLIST_EDIT_TARGET_LABELS = {
 /** YouTube IFrame Player API の最小表示サイズ（px） */
 export const PLAYER_MIN_SIZE = 200;
 
+/** プレイヤー表示サイズ */
+export const PLAYER_SIZES = {
+  SMALL: 'small',
+  MEDIUM: 'medium',
+  LARGE: 'large',
+};
+
+export const PLAYER_SIZE_LABELS = {
+  [PLAYER_SIZES.SMALL]: '小',
+  [PLAYER_SIZES.MEDIUM]: '中',
+  [PLAYER_SIZES.LARGE]: '大',
+};
+
+/** 中サイズ時にプレイヤーが占める画面高さの割合 */
+export const PLAYER_MEDIUM_VIEWPORT_RATIO = 0.5;
+
 /** 全曲エラー時の最低スキップ回数（プレイリストが短い場合の下限） */
 export const MIN_PLAYBACK_ERROR_RETRIES = 3;
 
