@@ -204,15 +204,23 @@ function App() {
   }, [mode, focusTracks, breakTracks]);
 
   const handleVideoEnd = useCallback(() => {
+    if (!isRunning) {
+      return;
+    }
     consecutivePlaybackErrorsRef.current[mode] = 0;
     setPlaybackError('');
     advanceToNextTrack();
-  }, [mode, advanceToNextTrack]);
+  }, [isRunning, mode, advanceToNextTrack]);
 
   const handleVideoError = useCallback(
     (errorCode) => {
-      const tracks = mode === TIMER_MODES.FOCUS ? focusTracks : breakTracks;
       const detail = formatYouTubeError(errorCode);
+      if (!isRunning) {
+        setPlaybackError(`動画を再生できません。（${detail}）`);
+        return;
+      }
+
+      const tracks = mode === TIMER_MODES.FOCUS ? focusTracks : breakTracks;
       const limit = getPlaybackErrorRetryLimit(tracks.length);
 
       consecutivePlaybackErrorsRef.current[mode] += 1;
@@ -231,7 +239,7 @@ function App() {
       );
       advanceToNextTrack();
     },
-    [mode, focusTracks, breakTracks, advanceToNextTrack, pause],
+    [isRunning, mode, focusTracks, breakTracks, advanceToNextTrack, pause],
   );
 
   const handlePlaybackOk = useCallback(() => {

@@ -91,12 +91,13 @@ const Player = forwardRef(function Player(
       height: String(frameSize.height),
       width: String(frameSize.width),
       playerVars: {
-        autoplay: 0,
+        // 初期表示・タイマー停止中は cue、稼働中の曲切替だけ自動再生する
+        autoplay: isRunning ? 1 : 0,
         controls: 1,
         ...(startSeconds != null ? { start: startSeconds } : {}),
       },
     }),
-    [frameSize.height, frameSize.width, startSeconds],
+    [frameSize.height, frameSize.width, startSeconds, isRunning],
   );
 
   const isPlayerReadyFor = useCallback((targetVideoId) => {
