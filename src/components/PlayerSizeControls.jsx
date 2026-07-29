@@ -19,7 +19,7 @@ function PlayerSizeControls({ size, onChange }) {
             type="button"
             aria-pressed={isActive}
             onClick={() => onChange(value)}
-            className={`min-w-9 rounded px-2 py-1 text-xs font-medium transition ${
+            className={`min-h-11 min-w-11 rounded px-3 py-2 text-sm font-medium transition sm:min-h-9 sm:min-w-9 sm:px-2 sm:py-1 sm:text-xs ${
               isActive
                 ? 'bg-gray-100 text-gray-900'
                 : 'text-gray-400 hover:bg-gray-700/80 hover:text-white'

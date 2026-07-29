@@ -56,7 +56,7 @@ function PlaylistForm({ playlistLabel, accent = 'focus', onAddTrack }) {
   };
 
   return (
-    <section className="mt-4 w-full max-w-xl rounded-2xl border border-gray-700 bg-gray-800/80 p-6 shadow-lg">
+    <section className="mt-4 w-full max-w-xl rounded-2xl border border-gray-700 bg-gray-800/80 p-4 shadow-lg sm:p-6">
       <h2 className="mb-1 text-lg font-semibold text-white">
         {playlistLabel}プレイリストに曲を追加
       </h2>
@@ -69,6 +69,9 @@ function PlaylistForm({ playlistLabel, accent = 'focus', onAddTrack }) {
           <span>YouTube URL</span>
           <input
             type="url"
+            inputMode="url"
+            enterKeyHint="done"
+            autoComplete="url"
             value={url}
             onChange={(event) => {
               setUrl(event.target.value);
@@ -77,11 +80,11 @@ function PlaylistForm({ playlistLabel, accent = 'focus', onAddTrack }) {
               }
             }}
             placeholder={URL_EXAMPLES[0]}
-            className={`rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-white placeholder:text-gray-500 focus:outline-none ${focusBorderClass}`}
+            className={`min-h-11 rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-base text-white placeholder:text-gray-500 focus:outline-none sm:text-sm ${focusBorderClass}`}
           />
         </label>
 
-        <p className="text-xs text-gray-500">
+        <p className="break-all text-xs text-gray-500">
           例: {URL_EXAMPLES.join(' / ')}
         </p>
 
@@ -99,7 +102,7 @@ function PlaylistForm({ playlistLabel, accent = 'focus', onAddTrack }) {
 
         <button
           type="submit"
-          className={`rounded-lg px-4 py-2 font-medium text-white transition ${submitButtonClass}`}
+          className={`min-h-11 rounded-lg px-4 py-2.5 font-medium text-white transition ${submitButtonClass}`}
         >
           追加
         </button>

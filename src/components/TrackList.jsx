@@ -42,7 +42,7 @@ function TrackListItem({ track, onRemove }) {
         type="button"
         onClick={() => onRemove(track.uid)}
         aria-label={`「${track.title}」を削除`}
-        className="shrink-0 rounded-lg px-3 py-1.5 text-sm text-gray-400 transition hover:bg-red-900/40 hover:text-red-400"
+        className="min-h-11 shrink-0 rounded-lg px-3 py-2 text-sm text-gray-400 transition hover:bg-red-900/40 hover:text-red-400 active:bg-red-900/60"
       >
         削除
       </button>
@@ -60,7 +60,7 @@ function TrackListItem({ track, onRemove }) {
  */
 function TrackList({ playlistLabel, tracks, onRemoveTrack }) {
   return (
-    <section className="mt-6 w-full max-w-xl rounded-2xl border border-gray-700 bg-gray-800/80 p-6 shadow-lg">
+    <section className="mt-6 w-full max-w-xl rounded-2xl border border-gray-700 bg-gray-800/80 p-4 shadow-lg sm:p-6">
       <h2 className="mb-1 text-lg font-semibold text-white">
         {playlistLabel}プレイリスト
       </h2>
