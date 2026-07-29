@@ -41,6 +41,12 @@ export const PLAYER_SIZE_LABELS = {
 /** 中サイズ時にプレイヤーが占める画面高さの割合 */
 export const PLAYER_MEDIUM_VIEWPORT_RATIO = 0.5;
 
+/** スマホ幅での中サイズ高さ割合（タイマー領域を確保） */
+export const PLAYER_MEDIUM_VIEWPORT_RATIO_MOBILE = 0.4;
+
+/** スマホ扱いの最大幅（px）。Tailwind の sm ブレークポイントに合わせる */
+export const MOBILE_MAX_WIDTH_PX = 640;
+
 /** 全曲エラー時の最低スキップ回数（プレイリストが短い場合の下限） */
 export const MIN_PLAYBACK_ERROR_RETRIES = 3;
 

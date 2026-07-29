@@ -339,10 +339,10 @@ const Player = forwardRef(function Player(
     <div
       className={
         size === PLAYER_SIZES.LARGE
-          ? 'fixed inset-0 z-50 flex flex-col bg-black/95 p-3'
+          ? 'fixed inset-0 z-50 flex flex-col bg-black/95 p-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))]'
           : size === PLAYER_SIZES.MEDIUM
-            ? 'fixed inset-x-0 bottom-0 z-40 flex h-[50vh] min-h-[248px] flex-col border-t border-gray-700 bg-gray-950/95 p-3 shadow-2xl'
-            : 'shrink-0 overflow-hidden rounded-lg bg-gray-800 shadow-lg'
+            ? 'fixed inset-x-0 bottom-0 z-40 flex h-[40vh] min-h-[248px] flex-col border-t border-gray-700 bg-gray-950/95 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-2xl sm:h-[50vh]'
+            : 'w-full max-w-[220px] shrink-0 overflow-hidden rounded-lg bg-gray-800 shadow-lg sm:w-auto sm:max-w-none'
       }
       style={
         size === PLAYER_SIZES.SMALL
@@ -351,9 +351,9 @@ const Player = forwardRef(function Player(
       }
       aria-label="YouTube プレイヤー"
     >
-      <div className="mb-2 flex flex-wrap items-center gap-3">
+      <div className="mb-2 flex flex-wrap items-center gap-2 sm:gap-3">
         <PlayerSizeControls size={size} onChange={onSizeChange} />
-        <label className="flex items-center gap-2 text-xs text-gray-300">
+        <label className="flex min-h-11 items-center gap-2 text-xs text-gray-300 sm:min-h-0">
           <span>音量</span>
           <input
             type="range"
@@ -361,14 +361,14 @@ const Player = forwardRef(function Player(
             max={100}
             value={volume}
             onChange={(event) => onVolumeChange(Number(event.target.value))}
-            className="w-24"
+            className="h-11 w-28 accent-gray-200 sm:h-auto sm:w-24"
           />
         </label>
         {size !== PLAYER_SIZES.SMALL && (
           <button
             type="button"
             onClick={() => onSizeChange(PLAYER_SIZES.SMALL)}
-            className="ml-auto rounded-md border border-gray-600 px-2 py-1 text-xs text-gray-200 transition hover:bg-gray-800"
+            className="ml-auto min-h-11 rounded-md border border-gray-600 px-3 py-2 text-sm text-gray-200 transition hover:bg-gray-800 sm:min-h-0 sm:px-2 sm:py-1 sm:text-xs"
           >
             タイマー表示に戻す
           </button>

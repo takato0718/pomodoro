@@ -277,12 +277,12 @@ function App() {
   );
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-900 px-4 py-8 text-white">
-      <h1 className="mb-8 text-4xl font-bold text-red-500">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-900 px-3 py-6 text-white sm:px-4 sm:py-8">
+      <h1 className="mb-6 text-center text-3xl font-bold text-red-500 sm:mb-8 sm:text-4xl">
         Simple YouTube Pomodoro
       </h1>
 
-      <div className="flex w-full max-w-5xl flex-col items-center gap-6 lg:flex-row lg:items-start lg:justify-center">
+      <div className="flex w-full max-w-5xl flex-col items-center gap-4 sm:gap-6 lg:flex-row lg:items-start lg:justify-center">
         <Timer
           mode={mode}
           remainingSeconds={remainingSeconds}
@@ -320,7 +320,7 @@ function App() {
       )}
 
       <div
-        className="mt-8 flex w-full max-w-xl rounded-xl border border-gray-700 bg-gray-800/80 p-1"
+        className="mt-6 flex w-full max-w-xl rounded-xl border border-gray-700 bg-gray-800/80 p-1 sm:mt-8"
         role="tablist"
         aria-label="編集するプレイリスト"
       >
@@ -337,7 +337,7 @@ function App() {
               role="tab"
               aria-selected={isActive}
               onClick={() => setEditTarget(target)}
-              className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition ${
+              className={`min-h-11 flex-1 rounded-lg px-3 py-2.5 text-sm font-medium transition sm:px-4 ${
                 isActive
                   ? activeClass
                   : 'text-gray-400 hover:bg-gray-700/60 hover:text-white'
