@@ -12,6 +12,7 @@ import {
   PLAYER_SIZES,
   PLAYLIST_EDIT_TARGETS,
   PLAYLIST_EDIT_TARGET_LABELS,
+  REORDER_ACTIONS,
   SECONDS_PER_MINUTE,
   STORAGE_KEYS,
   TIMER_MODES,
@@ -19,6 +20,7 @@ import {
 import {
   findTrackIndexByVideoId,
   getActiveVideoId,
+  moveTrack,
 } from './utils/playlist.js';
 import { clampTimerMinutes } from './utils/timerSettings.js';
 import {
@@ -133,6 +135,7 @@ function App() {
   // 編集対象（editTarget）と再生対象（mode）は独立。再生は useTimer の mode のみを使う
   const activeTracks = tracksByMode[editTarget];
   const setActiveTracks = setTracksByMode[editTarget];
+  const activeIndex = indexByMode[editTarget];
   const setActiveIndex = setIndexByMode[editTarget];
   const editTargetLabel = PLAYLIST_EDIT_TARGET_LABELS[editTarget];
   const isEditingBreak = editTarget === PLAYLIST_EDIT_TARGETS.BREAK;
@@ -284,6 +287,45 @@ function App() {
     [activeTracks, setActiveTracks, setActiveIndex],
   );
 
+  const handleReorderTrack = useCallback(
+    (uid, action) => {
+      const fromIndex = activeTracks.findIndex((track) => track.uid === uid);
+      if (fromIndex === -1) return;
+
+      const lastIndex = activeTracks.length - 1;
+      const destinationByAction = {
+        [REORDER_ACTIONS.UP]: fromIndex - 1,
+        [REORDER_ACTIONS.DOWN]: fromIndex + 1,
+        [REORDER_ACTIONS.TOP]: 0,
+        [REORDER_ACTIONS.BOTTOM]: lastIndex,
+      };
+      const toIndex = destinationByAction[action];
+      if (
+        toIndex == null ||
+        toIndex < 0 ||
+        toIndex > lastIndex ||
+        toIndex === fromIndex
+      ) {
+        return;
+      }
+
+      const currentUid = activeTracks[activeIndex]?.uid;
+      const nextTracks = moveTrack(activeTracks, fromIndex, toIndex);
+      setActiveTracks(nextTracks);
+
+      // 再生中の曲がズレないよう uid でインデックスを引き直す
+      if (currentUid) {
+        const nextIndex = nextTracks.findIndex(
+          (track) => track.uid === currentUid,
+        );
+        if (nextIndex >= 0) {
+          setActiveIndex(nextIndex);
+        }
+      }
+    },
+    [activeTracks, activeIndex, setActiveTracks, setActiveIndex],
+  );
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-900 px-3 py-6 text-white sm:px-4 sm:py-8">
       <h1 className="mb-6 text-center text-3xl font-bold text-red-500 sm:mb-8 sm:text-4xl">
@@ -363,9 +405,11 @@ function App() {
         onAddTrack={handleAddTrack}
       />
       <TrackList
+        key={editTarget}
         playlistLabel={editTargetLabel}
         tracks={activeTracks}
         onRemoveTrack={handleRemoveTrack}
+        onReorderTrack={handleReorderTrack}
       />
     </div>
   );
