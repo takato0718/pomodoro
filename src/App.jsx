@@ -329,7 +329,7 @@ function App() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-900 px-3 py-6 text-white sm:px-4 sm:py-8">
       <h1 className="mb-6 text-center text-3xl font-bold text-red-500 sm:mb-8 sm:text-4xl">
-        Simple YouTube Pomodoro
+        TubePomo
       </h1>
 
       <div className="flex w-full max-w-5xl flex-col items-center gap-4 sm:gap-6 lg:flex-row lg:items-start lg:justify-center">
