@@ -40,3 +40,33 @@ export function findTrackIndexByVideoId(tracks, videoId) {
     (track) => track?.type === TRACK_TYPES.VIDEO && track.id === videoId,
   );
 }
+
+/**
+ * 曲を別の位置へ移動した新しい配列を返す。無効な場合は元の配列を返す。
+ * @param {Array} tracks
+ * @param {number} fromIndex
+ * @param {number} toIndex
+ * @returns {Array}
+ */
+export function moveTrack(tracks, fromIndex, toIndex) {
+  if (!Array.isArray(tracks) || tracks.length === 0) {
+    return tracks;
+  }
+
+  const from = Math.trunc(fromIndex);
+  const to = Math.trunc(toIndex);
+  if (
+    from < 0 ||
+    to < 0 ||
+    from >= tracks.length ||
+    to >= tracks.length ||
+    from === to
+  ) {
+    return tracks;
+  }
+
+  const next = [...tracks];
+  const [item] = next.splice(from, 1);
+  next.splice(to, 0, item);
+  return next;
+}
