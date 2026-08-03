@@ -68,6 +68,14 @@ export const TRACK_TYPES = {
   PLAYLIST: 'playlist',
 };
 
+/** 曲の並び替え操作 */
+export const REORDER_ACTIONS = {
+  UP: 'up',
+  DOWN: 'down',
+  TOP: 'top',
+  BOTTOM: 'bottom',
+};
+
 export const DEFAULT_SETTINGS = {
   focusTime: DEFAULT_FOCUS_TIME_MINUTES,
   breakTime: DEFAULT_BREAK_TIME_MINUTES,
