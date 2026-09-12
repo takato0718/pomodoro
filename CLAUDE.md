@@ -44,3 +44,5 @@ LocalStorage のキー、デフォルト設定/曲リスト、タイマーの分
 
 ### デプロイ
 GitHub Pages の project site として公開しているため、`vite.config.js` で `base: '/pomodoro/'` を設定している。`index.html` には Google Analytics（gtag.js）と Open Graph/Twitter Card のメタタグも静的に埋め込まれており、リポジトリ名や base path を変更する場合はこれらも公開URLと整合させる必要がある。
+
+`main` への push をトリガーに `.github/workflows/deploy.yml`（GitHub Actions）が lint → build → `gh-pages` ブランチへの公開まで自動実行する（`peaceiris/actions-gh-pages` を使用）。`npm run deploy`（`gh-pages` パッケージによるローカルからの手動デプロイ）は緊急時のフォールバック用として残してある。

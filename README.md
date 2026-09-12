@@ -32,7 +32,11 @@ npm run dev
 | `npm run build` | 本番ビルド |
 | `npm run lint` | ESLint 実行 |
 | `npm run preview` | ビルド結果のプレビュー |
-| `npm run deploy` | GitHub Pages へデプロイ |
+| `npm run deploy` | （手動デプロイ用）GitHub Pages へデプロイ |
+
+## デプロイ（CI/CD）
+
+`main` ブランチに push すると GitHub Actions（`.github/workflows/deploy.yml`）が自動で lint → build → GitHub Pages（`gh-pages` ブランチ）へのデプロイを行う。手動でデプロイしたい場合のみ `npm run deploy` を実行する。
 
 ## ドキュメント
 
